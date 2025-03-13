@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz with Certificate</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        .hidden { display: none; }
+        .question { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz with Digital Certificate</h1>
+        <div id="userForm">
+            <h2>Enter Your Details</h2>
+            <form id="userDetailsForm" onsubmit="event.preventDefault(); startQuiz();">
+                <input id="name" placeholder="Name" required />
+                <input id="age" placeholder="Age" required />
+                <input id="college" placeholder="College Name" required />
+                <button type="submit">Start Quiz</button>
+            </form>
+        </div>
+        
+        <div id="quiz" class="hidden">
+            <h2>Quiz Questions</h2>
+            <form id="quizForm">
+                <div class="question">
+                    <p>1. What is the capital of India?</p>
+                    <input type="radio" name="q1" value="Delhi"> Delhi<br>
+                    <input type="radio" name="q1" value="Mumbai"> Mumbai<br>
+                </div>
+                <div class="question">
+                    <p>2. Who wrote the national anthem?</p>
+                    <input type="radio" name="q2" value="Tagore"> Tagore<br>
+                    <input type="radio" name="q2" value="Gandhi"> Gandhi<br>
+                </div>
+                <button type="button" onclick="submitQuiz()">Submit</button>
+            </form>
+        </div>
+        
+        <div id="result" class="hidden">
+            <h2>Quiz Completed!</h2>
+            <p id="score"></p>
+            <button onclick="generateCertificate()">Generate Participation Certificate</button>
+        </div>
+    </div>
+
+    <script>
+        function startQuiz() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const college = document.getElementById('college').value;
+
+            console.log('Start Quiz Clicked'); // Log to see if function is triggered
+
+            if (name && age && college) {
+                console.log('All fields filled:', { name, age, college });
+                document.getElementById('userForm').classList.add('hidden');
+                document.getElementById('quiz').classList.remove('hidden');
+            } else {
+                alert('Please fill out all the details before starting the quiz.');
+            }
+        }
+
+        function submitQuiz() {
+            document.getElementById('quiz').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('score').innerText = 'Thank you for participating!';
+        }
+
+        function generateCertificate() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const name = document.getElementById('name').value;
+            const college = document.getElementById('college').value;
+
+            // Add background color and border
+            doc.setFillColor(230, 230, 250); // Light lavender background
+            doc.rect(0, 0, 210, 297, 'F');
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(5);
+            doc.rect(5, 5, 200, 287);
+            
+            // Add certificate text
+            doc.setFontSize(28);
+            doc.text('Certificate of Participation ', 105, 70, null, null, 'center');
+            doc.setFontSize(20);
+            doc.text(`This is to certify that`, 105, 90, null, null, 'center');
+            
+            // Highlight and style participant's name
+            doc.setFontSize(24);
+            doc.setFont("courier", "italic");
+            doc.text(name, 105, 110, null, null, 'center');
+           // doc.line(60, 112, 150, 112); // Underline the name
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(16);
+            doc.text(`from ${college} has successfully participated in the quiz.`, 105, 130, null, null, 'center');
+            doc.text('Organized by NSSO', 105, 150, null, null, 'center');
+
+            // Add signature section
+            doc.text('Deputy Director General', 20, 240);
+            doc.text('Event Convenor', 140, 240);
+
+            doc.save(`${name}_Certificate.pdf`);
+        }
+    </script>
+</body>
+</html>
